@@ -35,6 +35,14 @@ module VagrantPlugins
             env[:ui].info " -- #{config.clone_from_vm ? "Source" : "Template"} VM: #{config.template_name}"
             env[:ui].info " -- Name: #{name}"
 
+            unless  config.customize.nil? then
+              env[:ui].info " -- Customize: #{config.customize}"
+              spec[:config] = RbVmomi::VIM.VirtualMachineConfigSpec()
+              config.customize.each do |key, value|
+                spec[:config][key.to_sym] = value
+              end
+            end
+
             new_vm = template.CloneVM_Task(:folder => template.parent, :name => name, :spec => spec).wait_for_completion
           rescue Exception => e
             puts e.message
